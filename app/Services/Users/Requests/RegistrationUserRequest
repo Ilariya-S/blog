@@ -5,7 +5,6 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class RegistrationUserRequest extends FormRequest
 {
-    //чи потрібне це чи ні
     public function authorize(): bool
     {
         return true;

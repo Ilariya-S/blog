@@ -11,10 +11,8 @@ class User extends Model
     protected $fillable = [
         'name',
         'email',
-        //'password',
         'image',
     ];
-    //подивтися що це
     protected $hidden = [
         'password',
     ];
