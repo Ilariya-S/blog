@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Service\Comments\Models;
+namespace App\Services\Comments\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Service\Posts\Models\Post;
-use App\Service\Users\Models\User;
+use App\Services\Posts\Models\Post;
+use App\Services\Users\Models\User;
 
 
 
@@ -17,11 +17,11 @@ class Comment extends Model
         'parent_id',
     ];
 
-    public function post()
+    public function posts()
     {
         return $this->belongsTo(Post::class);
     }
-    public function user()
+    public function users()
     {
         return $this->belongsTo(User::class);
     }
@@ -30,7 +30,7 @@ class Comment extends Model
         /**
          * Відношення "Багато до одного" (BelongsTo) до батьківського коментаря.
 */
-    public function parent()
+    public function parents()
     {
         return $this->belongsTo(Comment::class, 'parent_id');
     }

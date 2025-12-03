@@ -1,24 +1,28 @@
 <?php
 
-namespace App\Service\Users\Models;
+namespace App\Services\Users\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Service\Posts\Models\Post;
-use App\Service\Comments\Models\Comment;
+use App\Services\Posts\Models\Post;
+use App\Services\Comments\Models\Comment;
 
 class User extends Model
 {
     protected $fillable = [
         'name',
         'email',
-        'password',
+        //'password',
         'image',
     ];
-    public function post()
+    //подивтися що це
+    protected $hidden = [
+        'password',
+    ];
+    public function posts()
     {
         return $this->hasMany(Post::class, 'user_id');
     }
-    public function comment()
+    public function comments()
     {
         return $this->hasMany(Comment::class);
     }

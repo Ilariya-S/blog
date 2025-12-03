@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Service\Posts\Models;
+namespace App\Services\Posts\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Service\Users\Models\User;
-use App\Service\Posts\Models\Tag;
-use App\Service\Comments\Models\Comment;
+use App\Services\Users\Models\User;
+use App\Services\Posts\Models\Tag;
+use App\Services\Comments\Models\Comment;
 
 
 class Post extends Model
@@ -16,15 +16,15 @@ class Post extends Model
         'user_id',
         'views',
     ];
-    public function user()
+    public function users()
     {
         return $this->belongsTo(User::class);
     }
-    public function tag()
+    public function tags()
     {
         return $this->belongsToMany(Tag::class, 'post_tag', 'post_id', 'tag_id');
     }
-    public function comment()
+    public function comments()
     {
         return $this->hasMany(Comment::class);
     }
