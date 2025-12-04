@@ -1,18 +1,16 @@
 <?php
 namespace App\Services\Users\Managers;
 
-use App\Services\Users\Repositories\UserRepository;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Auth;
+use App\Services\Users\Models\User;
 
 
 class SendLetterManager
 {
-    /*public function __construct(private UserRepository $repository)
+    public function send(User $newuser)
     {
+        event(new Registered($newuser));
+        Auth::login($newuser);
     }
-
-    public function store(array $data)
-    {
-        return $this->repository->create($data);
-    }*/
 }

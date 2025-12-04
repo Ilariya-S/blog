@@ -5,9 +5,13 @@ namespace App\Services\Users\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Services\Posts\Models\Post;
 use App\Services\Comments\Models\Comment;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class User extends Model
+class User extends Authenticatable implements MustVerifyEmail
 {
+    use Notifiable;
     protected $fillable = [
         'name',
         'email',

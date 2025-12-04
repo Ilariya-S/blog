@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('password');
             $table->string('name');
             $table->string('image')->nullable();
+            $table->timestamp('email_verified_at')->nullable();
             $table->timestamps();
         });
     }
