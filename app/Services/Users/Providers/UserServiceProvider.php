@@ -21,6 +21,6 @@ class UserServiceProvider extends BaseServiceProvider
      */
     public function boot(): void
     {
-        $this->loadApiRoutes(base_path('app\Service\Users\Routes\routes.php'));
+        $this->loadApiRoutes(base_path('app\Services\Users\Routes\routes.php'));
     }
 }
