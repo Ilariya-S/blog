@@ -9,6 +9,8 @@ use App\Services\Users\Managers\SendLetterManager;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
+use App\Services\Users\Models\User;
+
 class UserController extends Controller
 {
     public function __construct(private RegistrationManager $registrtiomanager, private SendLetterManager $sendlettermanager)
@@ -45,7 +47,24 @@ class UserController extends Controller
     }
     public function newlink(Request $request)
     {
-        $request->user()->sendEmailVerificationNotification();
+        $request->validate([
+            'email' => ['required', 'email', 'exists:users,email'],
+        ]);
+
+        // 2. Знаходимо користувача за email
+        $user = User::where('email', $request->email)->first();
+
+        // 3. Перевірка: пошта вже верифікована
+        if ($user->hasVerifiedEmail()) {
+            return response()->json([
+                'status' => 'info',
+                'message' => 'Email is already verified.',
+            ], 200);
+        }
+
+        // 4. Надсилаємо лист
+        $user->sendEmailVerificationNotification();
+
         return response()->json([
             'status' => 'success',
             'message' => 'Verification link sent!',

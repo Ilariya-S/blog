@@ -8,11 +8,11 @@ Route::prefix('users')->group(function () {
     Route::prefix('registration')->group(function () {
         Route::post('/', [UserController::class, 'registration']);
         Route::get('/verify-email', [UserController::class, 'verifyemail'])
-            ->middleware('auth')->name('verification.notice');
+            ->name('verification.notice');
         Route::get('/email/verify/{id}/{hash}', [UserController::class, 'verify'])
-            ->middleware(['auth', 'signed'])->name('verification.verify');
+            ->name('verification.verify');
         Route::post('/email/verification-notification', [UserController::class, 'newlink'])
-            ->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+            ->middleware(['throttle:6,1'])->name('verification.send');
     });
 
     //авторизація -> вхід в акаунт (перевірка токена)

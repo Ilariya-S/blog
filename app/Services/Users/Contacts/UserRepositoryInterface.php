@@ -2,7 +2,6 @@
 
 namespace App\Services\Users\Contacts;
 
-
 interface UserRepositoryInterface
 {
     public function model();

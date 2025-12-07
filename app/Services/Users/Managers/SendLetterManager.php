@@ -11,6 +11,6 @@ class SendLetterManager
     public function send(User $newuser)
     {
         event(new Registered($newuser));
-        Auth::login($newuser);
+        //Auth::login($newuser);
     }
 }
