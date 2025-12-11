@@ -16,7 +16,9 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     {
         //Хешуємо пароль перед збереженням
         $data['password'] = Hash::make($data['password']);
-        unset($data['password_confirmation']);
+        if (isset($data['password_confirmation'])) {
+            unset($data['password_confirmation']);
+        }
         return $this->model->create($data);
     }
 
