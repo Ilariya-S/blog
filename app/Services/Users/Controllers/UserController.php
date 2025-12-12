@@ -3,117 +3,68 @@
 namespace App\Services\Users\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\Users\Requests\RegistrationUserRequest;
+
 use App\Services\Users\Managers\RegistrationManager;
 use App\Services\Users\Managers\SendLetterManager;
-
-
-
-use Illuminate\Http\Request;
+use App\Services\Users\Managers\SendNewVerifyLinkManager;
 use App\Services\Users\Models\User;
-use Illuminate\Auth\Events\Verified;
+use App\Services\Users\Managers\VerifyManager;
+use App\Services\Users\Requests\NewLinkSendToUserRequest;
+use App\Services\Users\Requests\RegistrationUserRequest;
+use App\Services\Users\Requests\AutorizationUserRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 
 class UserController extends Controller
 {
     public function __construct(
-        private RegistrationManager $registrtiomanager,
-        private SendLetterManager $sendlettermanager
+        private RegistrationManager $registrtioManager,
+        private SendLetterManager $sendLetterManager,
+        private SendNewVerifyLinkManager $sendNewVerufyLinkManager,
+        private VerifyManager $verifyManager
     ) {
     }
+
+    // реєстрація користувача
     public function registration(RegistrationUserRequest $request)
     {
         $payload = $request->validated();
-        $user = $this->registrtiomanager->store($payload);
-        $this->sendlettermanager->send($user);
+        $user = $this->registrtioManager->store($payload);
+        $this->sendLetterManager->send($user);
         return response()->json([
             'status' => 'success',
             'message' => 'Registration successful. Please check your email for the verification link.',
         ]);
     }
 
-    /*public function verifyemail()
+    // верифікація пошти користувача
+    public function verify($id, $hash)
     {
-        $resendLink = route('verification.send');
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Thank you for registering. Please check your email.',
-            'info' => 'Didn`t receive the link?',
-            'resend_link' => $resendLink,
-            'resend_text' => 'Send verification link again',
-        ]);
-    }*/
-    public function verify($id, $hash, Request $request)
-    {// 1. Знаходимо користувача за ID з URL
         $user = User::find($id);
-
-        if (!$user) {
+        if ($user) {
+            return $this->verifyManager->verify($user, $hash);
+        } else {
             return response()->json(['message' => 'User not found.'], 404);
         }
-
-        // 2. Перевірка хешу (безпека, хоча signed middleware це теж робить)
-        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-            return response()->json(['message' => 'Invalid verification link.'], 403);
-        }
-
-        // 3. Якщо вже верифікований
-        if ($user->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Email already verified.'], 200);
-        }
-
-        // 4. Позначаємо як верифікований і запускаємо подію
-        if ($user->markEmailAsVerified()) {
-            event(new Verified($user));
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Email successfully verified. You can now login.'
-        ]);
-        /*
-        $request->fulfill();
-        return response()->json([
-            'massage' => 'Registration was successful, email was verified'
-        ]);*/
-    }
-    public function newlink(Request $request)
-    {
-        $request->validate([
-            'email' => ['required', 'email', 'exists:users,email'],
-        ]);
-
-        // 2. Знаходимо користувача за email
-        $user = User::where('email', $request->email)->first();
-
-        // 3. Перевірка: пошта вже верифікована
-        if ($user->hasVerifiedEmail()) {
-            return response()->json([
-                'status' => 'info',
-                'message' => 'Email is already verified.',
-            ], 200);
-        }
-
-        // 4. Надсилаємо лист
-        $user->sendEmailVerificationNotification();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Verification link sent!',
-        ]);
     }
 
-
-    ///дивна авторизація
-    public function login(Request $request)
+    // надсиланя новго посилання на верифікацію пошти
+    public function newlink(NewLinkSendToUserRequest $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string'],
-        ]);
+        $payload = $request->validated();
+        $user = User::where('email', $payload->email)->first();
+        if ($user) {
+            return $this->sendNewVerufyLinkManager->send($user);
+        }
+    }
+
+    // авторизація користувача
+    public function login(AutorizationUserRequest $request)
+    {
+        $payload = $request->validated();
 
         // Спроба отримати токен
-        if (!$token = auth()->attempt($credentials)) {
+        if (!$token = auth()->attempt($payload)) {
             return response()->json(['message' => 'Invalid login credentials.'], 401);
         }
 
@@ -122,21 +73,32 @@ class UserController extends Controller
         // Перевірка верифікації пошти
         if (!$user->hasVerifiedEmail()) {
             auth()->logout(); // Викидаємо, якщо не підтвердив
+
             return response()->json([
                 'status' => 'error',
-                'message' => 'Your email address is not verified. Please check your inbox.'
+                'message' => 'Your email address is not verified. Please check your inbox.',
             ], 403);
         }
 
-        return $this->respondWithToken($token);
+        // return $this->respondWithToken($token);
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60,
+            'user' => auth()->user(),
+        ]);
     }
 
+    // вихід користувача
     public function destroy()
     {
         auth()->logout();
+
         return response()->json(['message' => 'Successfully logged out']);
     }
 
+    // виршити чи потрібні
+    /*
     public function me(Request $request)
     {
         return response()->json($request->user());
@@ -145,15 +107,12 @@ class UserController extends Controller
     public function refresh()
     {
         return $this->respondWithToken(auth()->refresh());
-    }
-
-    protected function respondWithToken($token)
-    {
         return response()->json([
-            'access_token' => $token,
+            'access_token' => (auth()->refresh()),
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
             'user' => auth()->user()
         ]);
     }
+    */
 }
