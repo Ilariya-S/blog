@@ -72,7 +72,7 @@ class UserController extends Controller
     public function newlink(NewLinkSendToUserRequest $request)
     {
         $payload = $request->validated();
-        $user = User::where('email', $payload->email)->first();
+        $user = User::where('email', $payload['email'])->first();
 
         if (!$user) {
             return response()->json([
