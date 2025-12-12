@@ -9,17 +9,9 @@ class SendNewVerifyLinkManager
     public function send(User $user)
     {
         if ($user->hasVerifiedEmail()) {
-            return response()->json([
-                'status' => 'info',
-                'message' => 'Email is already verified.',
-            ], 200);
+            return false;
         }
-
         $user->sendEmailVerificationNotification();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Verification link sent!',
-        ]);
+        return true;
     }
 }

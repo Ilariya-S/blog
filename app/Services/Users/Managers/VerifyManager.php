@@ -3,32 +3,25 @@
 namespace App\Services\Users\Managers;
 
 use App\Services\Users\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Verified;
+use App\Services\Users\Exceptions\VerificationException;
 
 class VerifyManager
 {
-
-    public function verify(User $user, $hash)
+    public function verify(User $user, $hash): bool
     {
-        // 2. Перевірка хешу (безпека, хоча signed middleware це теж робить)
         if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-            return response()->json(['message' => 'Invalid verification link.'], 403);
+            throw new VerificationException('Invalid verification link.', 403);
         }
 
-        // 3. Якщо вже верифікований
         if ($user->hasVerifiedEmail()) {
-            return response()->json(['message' => 'Email already verified.'], 200);
+            return false;
         }
 
-        // 4. Позначаємо як верифікований і запускаємо подію
         if ($user->markEmailAsVerified()) {
             event(new Verified($user));
         }
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Email successfully verified. You can now login.',
-        ]);
+        return true;
     }
 }
