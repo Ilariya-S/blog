@@ -4,10 +4,14 @@ namespace App\Services\Users\Managers;
 use Illuminate\Support\Facades\Auth;
 use App\Services\Users\Exceptions\AuthorizationException;
 use App\Services\Users\Exceptions\VerificationException;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AutorizationManager
 {
-    public function login(array $data): string
+    public function login(array $data)
     {
         if (!$token = Auth::attempt($data)) {
             throw new AuthorizationException('Invalid login credentials.', 401);
@@ -21,5 +25,17 @@ class AutorizationManager
         }
 
         return $token;
+    }
+    public function newPassword(array $data)
+    {
+        return Password::reset($data, function ($user, $password) {
+            $user->forceFill([
+                'password' => Hash::make($password)
+            ])->setRememberToken(Str::random(60));
+
+            $user->save();
+
+            event(new PasswordReset($user));
+        });
     }
 }
