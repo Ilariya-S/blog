@@ -20,7 +20,7 @@ class UserServiceProvider extends BaseServiceProvider
      */
     public function boot(): void
     {
-        $this->loadApiRoutes(base_path('app\Services\Users\Routes\routes.php'));
+        $this->loadApiRoutes(base_path(__DIR__ . '/../Routes/routes.php'));
         ResetPassword::createUrlUsing(function (object $user, string $token) {
             return "http://127.0.0.1:8000/api/users/reset-password?token={$token}&email={$user->email}";
         });

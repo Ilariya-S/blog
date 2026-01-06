@@ -2,7 +2,6 @@
 
 namespace App\Services\Users\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Services\Posts\Models\Post;
 use App\Services\Comments\Models\Comment;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -36,7 +35,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
      *
      * @return mixed
      */
-    public function getJWTIdentifier()
+    public function getJWTIdentifier(): mixed
     {
         return $this->getKey();
     }
@@ -46,7 +45,7 @@ class User extends Authenticatable implements JWTSubject, MustVerifyEmail
      *
      * @return array
      */
-    public function getJWTCustomClaims()
+    public function getJWTCustomClaims(): array
     {
         return [];
     }

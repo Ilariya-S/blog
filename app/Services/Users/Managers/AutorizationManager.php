@@ -2,14 +2,13 @@
 namespace App\Services\Users\Managers;
 
 use Illuminate\Support\Facades\Auth;
-use App\Services\Users\Exceptions\AuthorizationException;
-use App\Services\Users\Exceptions\VerificationException;
+use App\Services\Users\Exceptions\{AuthorizationException, VerificationException};
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-class AutorizationManager
+class AuthorizationManager
 {
     public function login(array $data)
     {

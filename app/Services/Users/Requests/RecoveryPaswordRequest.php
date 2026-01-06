@@ -3,7 +3,7 @@ namespace App\Services\Users\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RecoveryPaswordRequest extends FormRequest
+class RecoveryPasswordRequest extends FormRequest
 {
     public function authorize(): bool
     {

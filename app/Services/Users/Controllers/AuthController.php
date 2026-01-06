@@ -3,30 +3,26 @@
 namespace App\Services\Users\Controllers;
 //від ларавел
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\{Auth, Password};
 //менеджери
-use App\Services\Users\Managers\RegistrationManager;
-use App\Services\Users\Managers\AutorizationManager;
+use App\Services\Users\Managers\{RegistrationManager, AuthorizationManager};
 //валідація даних + модель
 use App\Services\Users\Models\User;
-use App\Services\Users\Requests\NewLinkSendToUserRequest;
-use App\Services\Users\Requests\RegistrationUserRequest;
-use App\Services\Users\Requests\AutorizationUserRequest;
-use App\Services\Users\Requests\RecoveryPaswordRequest;
-use App\Services\Users\Requests\ResetPasswordRequest;
+use App\Services\Users\Requests\{
+    NewLinkSendToUserRequest,
+    RegistrationUserRequest,
+    AuthorizationUserRequest,
+    RecoveryPasswordRequest,
+    ResetPasswordRequest,
+};
 //помилки
-use App\Services\Users\Exceptions\AuthorizationException;
-use App\Services\Users\Exceptions\VerificationException;
-
-
+use App\Services\Users\Exceptions\{AuthorizationException, VerificationException};
 
 class AuthController extends Controller
 {
     public function __construct(
-        private RegistrationManager $registrtioManager,
-        private AutorizationManager $authManager
+        private RegistrationManager $registrationManager,
+        private AuthorizationManager $authManager
     ) {
     }
 
@@ -34,8 +30,8 @@ class AuthController extends Controller
     public function registration(RegistrationUserRequest $request)
     {
         $payload = $request->validated();
-        $user = $this->registrtioManager->register($payload);
-        $this->registrtioManager->sendLink($user);
+        $user = $this->registrationManager->register($payload);
+        $this->registrationManager->sendLink($user);
         return response()->json([
             'status' => 'success',
             'message' => 'Registration successful. Please check your email for the verification link.',
@@ -45,12 +41,9 @@ class AuthController extends Controller
     // верифікація пошти користувача
     public function verify($id, $hash)
     {
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['message' => 'User not found.'], 404);
-        }
+        $user = User::findOrFail($id);
         try {
-            $status = $this->registrtioManager->verify($user, $hash);
+            $status = $this->registrationManager->verify($user, $hash);
 
             if ($status === false) {
                 return response()->json(['message' => 'Email already verified.'], 200);
@@ -66,19 +59,11 @@ class AuthController extends Controller
     }
 
     // надсиланя новго посилання на верифікацію пошти
-    public function newlink(NewLinkSendToUserRequest $request)
+    public function newLink(NewLinkSendToUserRequest $request)
     {
         $payload = $request->validated();
-        $user = User::where('email', $payload['email'])->first();
 
-        if (!$user) {
-            return response()->json([
-                'status' => 'info',
-                'message' => 'If the user exists and is not verified, a new verification link has been sent.',
-            ], 200);
-        }
-
-        $linkSent = $this->registrtioManager->sendNewLink($user);
+        $linkSent = $this->registrationManager->sendNewLink($payload);
         if ($linkSent) {
             return response()->json([
                 'status' => 'success',
@@ -92,7 +77,7 @@ class AuthController extends Controller
     }
 
     // авторизація користувача
-    public function login(AutorizationUserRequest $request)
+    public function login(AuthorizationUserRequest $request)
     {
         $payload = $request->validated();
         try {
@@ -118,11 +103,13 @@ class AuthController extends Controller
         Auth::logout();
         return response()->json(['message' => 'Successfully logged out']);
     }
+
     //відображати профіль користувача, можливо не потрбіний
-    public function me(Request $request)
+    /*public function me(Request $request)
     {
         return response()->json($request->user());
-    }
+    }*/
+
     //оновлення токена, коли час дії минув
     public function refresh()
     {
@@ -133,8 +120,9 @@ class AuthController extends Controller
             'user' => auth()->user(),
         ]);
     }
+
     //надсилання листа: оновлення пароля
-    public function recoveryPassword(RecoveryPaswordRequest $request)
+    public function recoveryPassword(RecoveryPasswordRequest $request)
     {
         $payload = $request->validated();
         $status = Password::sendResetLink($payload);
@@ -149,6 +137,7 @@ class AuthController extends Controller
             'message' => __($status),
         ], 400);
     }
+
     //новий пароль
     public function resetPassword(ResetPasswordRequest $request)
     {

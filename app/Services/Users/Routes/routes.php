@@ -6,7 +6,7 @@ use App\Services\Users\Controllers\AuthController;
 Route::prefix('users')->group(function () {
     Route::prefix('registration')->group(function () {
         Route::post('/', [AuthController::class, 'registration']);
-        Route::post('/email/verification-notification', [AuthController::class, 'newlink'])
+        Route::post('/email/verification-notification', [AuthController::class, 'newLink'])
             ->middleware(['throttle:6,1'])
             ->name('verification.send');
         Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
