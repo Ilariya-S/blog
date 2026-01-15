@@ -14,6 +14,7 @@ class Post extends Model
         'title',
         'body',
         'user_id',
+        'category_id',
         'views',
     ];
     public function users()
@@ -27,6 +28,10 @@ class Post extends Model
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
     /* на майбутьнє
     // --- Аксесори для функціоналу ---

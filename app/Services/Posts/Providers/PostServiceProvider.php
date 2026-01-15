@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Services\Users\Providers;
+namespace App\Services\Posts\Providers;
 
 use App\Providers\BaseServiceProvider;
 use Illuminate\Auth\Notifications\ResetPassword;
 
-class UserServiceProvider extends BaseServiceProvider
+class PostServiceProvider extends BaseServiceProvider
 {
     /**
      * Register services.
@@ -21,8 +21,5 @@ class UserServiceProvider extends BaseServiceProvider
     public function boot(): void
     {
         $this->loadApiRoutes(__DIR__ . '/../Routes/routes.php');
-        ResetPassword::createUrlUsing(function (object $user, string $token) {
-            return "http://127.0.0.1:8000/api/users/reset-password?token={$token}&email={$user->email}";
-        });
     }
 }

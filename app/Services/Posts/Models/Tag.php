@@ -8,7 +8,7 @@ use App\Services\Posts\Models\Post;
 class Tag extends Model
 {
     protected $fillable = [
-        'name',
+        'title',
     ];
     public function posts()
     {
