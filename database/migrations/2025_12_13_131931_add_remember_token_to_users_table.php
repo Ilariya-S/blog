@@ -10,10 +10,8 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('tags', function (Blueprint $table) {
-            $table->id();
-            $table->string('title')->unique();
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->rememberToken();
         });
     }
 
@@ -22,7 +20,8 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('tags');
-
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropRememberToken();
+        });
     }
 };
