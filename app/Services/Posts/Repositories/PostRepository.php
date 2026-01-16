@@ -20,5 +20,31 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface
         }
         return $post;
     }
+    public function update(array $data, $id): Post
+    {
+        $post = Post::findOrFail($id);
+        $post->update($data);
+        if (isset($data['tags_ids'])) {
+            $post->tags()->sync($data['tags_ids']);
+        }
+
+        return $post;
+    }
+    public function delete($id): bool
+    {
+        return $this->model->destroy($id);
+    }
+    public function findWithDetails(int $id): Post
+    {
+        // нагадати що таке with() та записати 
+        return Post::with(['users', 'category', 'tags'])
+            ->findOrFail($id);
+    }
+
+    public function incrementViews(Post $post): void
+    {
+        $post->increment('views');
+    }
+
 
 }

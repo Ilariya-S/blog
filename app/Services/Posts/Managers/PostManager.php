@@ -5,6 +5,7 @@ use App\Services\Posts\Repositories\PostRepository;
 use App\Services\Posts\Repositories\CategoryRepository;
 use App\Services\Posts\Repositories\TagRepository;
 use Illuminate\Support\Facades\DB;
+use App\Services\Posts\Models\Post;
 
 class PostManager
 {
@@ -22,7 +23,7 @@ class PostManager
 
             //подив як можна зробити простіше, випадково чи  не намудрено
             $tagIds = [];
-            if (!empty($data['tags'])) {
+            if (isset($data['tags'])) {
                 foreach ($data['tags'] as $tagTitle) {
                     $tag = $this->tagRepository->findOrCreateTag($tagTitle);
                     $tagIds[] = $tag->id;
@@ -38,5 +39,39 @@ class PostManager
 
             return $this->postRepository->create($postData);
         });
+    }
+    public function updatePost(int $postId, array $data)
+    {
+        return DB::transaction(function () use ($postId, $data, ) {
+
+            Post::findOrFail($postId);
+            if (isset($data['category'])) {
+                $category = $this->categoryRepository->findOrCreateCategories($data['category']);
+                $data['category_id'] = $category->id;
+            }
+            if (isset($data['tags'])) {
+                $tagIds = [];
+                foreach ($data['tags'] as $tagName) {
+                    $tag = $this->tagRepository->findOrCreateTag($tagName);
+                    $tagIds[] = $tag->id;
+                }
+                $data['tags_ids'] = $tagIds;
+            }
+            return $this->postRepository->update($data, $postId);
+        });
+    }
+    public function deletePost(int $postId): bool
+    {
+        return $this->postRepository->delete($postId);
+    }
+    public function getPostAndLogView(int $id, ?int $currentUserId): Post
+    {
+        $post = $this->postRepository->findWithDetails($id);
+
+        if ($currentUserId !== $post->user_id) {
+            $this->postRepository->incrementViews($post);
+        }
+
+        return $post;
     }
 }
