@@ -25,5 +25,5 @@ Route::prefix('users')->group(function () {
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/forget-password', [AuthController::class, 'recoveryPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-    Route::get('/{id}', [ProfileController::class, 'show']);
+    Route::get('/profile/{id}', [ProfileController::class, 'show']);
 });

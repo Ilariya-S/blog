@@ -6,8 +6,6 @@ use App\Services\Users\Requests\UpdateAvatarRequest;
 use App\Services\Users\Managers\UserManager;
 use App\Services\Users\Resources\UserProfileResource;
 use Illuminate\Http\JsonResponse;
-use App\Services\Users\Models\User;
-
 
 class ProfileController extends Controller
 {
@@ -26,7 +24,6 @@ class ProfileController extends Controller
 
     public function updateAvatar(UpdateAvatarRequest $request): JsonResponse
     {
-        // пеервірити чи працює
         $user = auth()->user();
         $payload = $request->validated();
         $path = $this->userManager->uploadAvatar($user, $payload['avatar']);
