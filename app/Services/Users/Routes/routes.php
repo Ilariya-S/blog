@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Services\Users\Controllers\AuthController;
+use App\Services\Users\Controllers\ProfileController;
 
 Route::prefix('users')->group(function () {
     Route::prefix('registration')->group(function () {
@@ -15,12 +16,14 @@ Route::prefix('users')->group(function () {
     });
 
     Route::post('/login', [AuthController::class, 'login']);
+
     Route::middleware('auth:api')->group(function () {
         Route::post('/logout', [AuthController::class, 'destroy']);
-        Route::get('/me', [AuthController::class, 'me']);
-        // Route::post('/refresh', [AuthController::class, 'refresh']);
+        Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar']);
     });
+
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/forget-password', [AuthController::class, 'recoveryPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::get('/{id}', [ProfileController::class, 'show']);
 });

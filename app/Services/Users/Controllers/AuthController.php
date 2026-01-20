@@ -1,11 +1,9 @@
 <?php
 namespace App\Services\Users\Controllers;
-//від ларавел
+
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\{Auth, Password};
-//менеджери
 use App\Services\Users\Managers\{RegistrationManager, AuthorizationManager};
-//валідація даних + модель
 use App\Services\Users\Models\User;
 use App\Services\Users\Requests\{
     NewLinkSendToUserRequest,
@@ -14,7 +12,6 @@ use App\Services\Users\Requests\{
     RecoveryPasswordRequest,
     ResetPasswordRequest,
 };
-//помилки
 use App\Services\Users\Exceptions\{AuthorizationException, VerificationException};
 
 class AuthController extends Controller
@@ -25,7 +22,7 @@ class AuthController extends Controller
     ) {
     }
 
-    // реєстрація користувача
+    // registration user
     public function registration(RegistrationUserRequest $request)
     {
         $payload = $request->validated();
@@ -37,7 +34,7 @@ class AuthController extends Controller
         ]);
     }
 
-    // верифікація пошти користувача
+    // verify email`s user
     public function verify($id, $hash)
     {
         $user = User::findOrFail($id);
@@ -57,7 +54,7 @@ class AuthController extends Controller
         }
     }
 
-    // надсиланя новго посилання на верифікацію пошти
+    // send new verify link
     public function newLink(NewLinkSendToUserRequest $request)
     {
         $payload = $request->validated();
@@ -75,7 +72,7 @@ class AuthController extends Controller
         ], );
     }
 
-    // авторизація користувача
+    // login user
     public function login(AuthorizationUserRequest $request)
     {
         $payload = $request->validated();
@@ -96,20 +93,14 @@ class AuthController extends Controller
         }
     }
 
-    // вихід користувача
+    // logout user
     public function destroy()
     {
         Auth::logout();
         return response()->json(['message' => 'Successfully logged out']);
     }
 
-    //відображати профіль користувача, можливо не потрбіний
-    /*public function me(Request $request)
-    {
-        return response()->json($request->user());
-    }*/
-
-    //оновлення токена, коли час дії минув
+    //refresh token, when time over
     public function refresh()
     {
         return response()->json([
@@ -120,7 +111,7 @@ class AuthController extends Controller
         ]);
     }
 
-    //надсилання листа: оновлення пароля
+    //send link: recovery password
     public function recoveryPassword(RecoveryPasswordRequest $request)
     {
         $payload = $request->validated();
@@ -137,7 +128,7 @@ class AuthController extends Controller
         ], 400);
     }
 
-    //новий пароль
+    //new password
     public function resetPassword(ResetPasswordRequest $request)
     {
         $payload = $request->validated();

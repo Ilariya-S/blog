@@ -20,14 +20,12 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface
         }
         return $post;
     }
-    public function update(array $data, $id): Post
+    public function update(array $data, $post): Post
     {
-        $post = Post::findOrFail($id);
         $post->update($data);
         if (isset($data['tags_ids'])) {
             $post->tags()->sync($data['tags_ids']);
         }
-
         return $post;
     }
     public function delete($id): bool
@@ -36,7 +34,6 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface
     }
     public function findWithDetails(int $id): Post
     {
-        // нагадати що таке with() та записати 
         return Post::with(['users', 'category', 'tags'])
             ->findOrFail($id);
     }

@@ -5,6 +5,8 @@ namespace App\Services\Posts\Repositories;
 use App\Services\Posts\Contacts\CategoryRepositoryInterface;
 use App\Services\Posts\Models\Category;
 use Prettus\Repository\Eloquent\BaseRepository;
+use Illuminate\Support\Str;
+
 
 class CategoryRepository extends BaseRepository implements CategoryRepositoryInterface
 {
@@ -15,7 +17,7 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
     public function findOrCreateCategories(string $title): Category
     {
         return $this->model->firstOrCreate([
-            'title' => $title
+            'title' => Str::lower($title)
         ]);
     }
 

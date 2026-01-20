@@ -19,9 +19,10 @@ class PostManager
     {
         return DB::transaction(function () use ($data, $userId) {
 
-            $category = $this->categoryRepository->findOrCreateCategories($data['category']);
+            $data['category_id'] = $this->categoryRepository
+                ->findOrCreateCategories($data['category'])
+                ->id;
 
-            //подив як можна зробити простіше, випадково чи  не намудрено
             $tagIds = [];
             if (isset($data['tags'])) {
                 foreach ($data['tags'] as $tagTitle) {
@@ -29,22 +30,16 @@ class PostManager
                     $tagIds[] = $tag->id;
                 }
             }
-            $postData = [
-                'title' => $data['title'],
-                'body' => $data['body'],
-                'user_id' => $userId,
-                'category_id' => $category->id,
-                'tags_ids' => $tagIds,
-            ];
+            $data['user_id'] = $userId;
+            $data['tags_ids'] = $tagIds;
 
-            return $this->postRepository->create($postData);
+            return $this->postRepository->create($data);
         });
     }
-    public function updatePost(int $postId, array $data)
+    public function updatePost(int $post, array $data)
     {
-        return DB::transaction(function () use ($postId, $data, ) {
+        return DB::transaction(function () use ($post, $data, ) {
 
-            Post::findOrFail($postId);
             if (isset($data['category'])) {
                 $category = $this->categoryRepository->findOrCreateCategories($data['category']);
                 $data['category_id'] = $category->id;
@@ -57,7 +52,7 @@ class PostManager
                 }
                 $data['tags_ids'] = $tagIds;
             }
-            return $this->postRepository->update($data, $postId);
+            return $this->postRepository->update($data, $post);
         });
     }
     public function deletePost(int $postId): bool

@@ -13,12 +13,11 @@ class PostResource extends JsonResource
             'views' => $this->views,
             'created_at' => $this->created_at->format('d.m.Y H:i'),
             'author' => [
-                'name' => $this->users?->name ?? 'Невідомий автор',
+                'name' => $this->users?->name,
             ],
-            'category' => [
-                'title' => $this->category?->title ?? 'Без категорії',
-
-            ],
+            'category' => $this->category ? [
+                'title' => $this->category->title,
+            ] : null,
             'tags' => $this->tags->map(function ($tag) {
                 return ['title' => $tag->title];
             }),

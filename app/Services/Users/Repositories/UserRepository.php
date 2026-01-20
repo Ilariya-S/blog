@@ -16,5 +16,17 @@ class UserRepository extends BaseRepository implements UserRepositoryInterface
     {
         return $this->model->create($data);
     }
+    public function getUserWithPosts(int $id)
+    {
+        return $this->model->with([
+            'posts' => function ($query) {
+                $query->latest();
+            }
+        ])->findOrFail($id);
+    }
+    public function updateAvatar(int $userId, string $path): bool
+    {
+        return $this->model->where('id', $userId)->update(['image' => $path]);
+    }
 
 }

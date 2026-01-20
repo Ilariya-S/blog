@@ -15,7 +15,7 @@ class RegistrationManager
 
     public function register(array $data)
     {
-        //Хешуємо пароль перед збереженням
+        //Hash password
         $data['password'] = Hash::make($data['password']);
         if (isset($data['password_confirmation'])) {
             unset($data['password_confirmation']);

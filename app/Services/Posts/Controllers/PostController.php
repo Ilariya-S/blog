@@ -7,6 +7,7 @@ use App\Services\Posts\Requests\{CreatePostRequest, UpdatePostRequest};
 use App\Services\Posts\Managers\PostManager;
 use App\Services\Posts\Models\Post;
 use Illuminate\Support\Facades\Gate;
+//use Illuminate\Support\Facades\Gate; + файл PostPolicy
 use App\Services\Posts\Resources\PostResource;
 class PostController extends Controller
 {
@@ -29,7 +30,7 @@ class PostController extends Controller
         $post = Post::findOrFail($id);
         Gate::authorize('update', $post);
         $payload = $request->validated();
-        $updatedPost = $this->postManager->updatePost($post->id, $payload);
+        $updatedPost = $this->postManager->updatePost($post, $payload);
         return response()->json([
             'message' => 'Post updated successfully',
             'data' => $updatedPost->load('tags', 'category')
