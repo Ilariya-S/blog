@@ -5,7 +5,6 @@ namespace App\Services\Posts\Repositories;
 use App\Services\Posts\Contacts\PostRepositoryInterface;
 use App\Services\Posts\Models\Post;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-// нове
 use Prettus\Repository\Eloquent\BaseRepository;
 
 class PostRepository extends BaseRepository implements PostRepositoryInterface
@@ -51,7 +50,6 @@ class PostRepository extends BaseRepository implements PostRepositoryInterface
         $post->increment('views');
     }
 
-    // нове
     public function getFilteredPosts(array $filters): LengthAwarePaginator
     {
         $query = $this->model->query()
