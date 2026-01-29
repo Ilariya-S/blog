@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Services\Users\Controllers\AuthController;
 use App\Services\Users\Controllers\ProfileController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('users')->group(function () {
     Route::prefix('registration')->group(function () {
@@ -25,5 +25,5 @@ Route::prefix('users')->group(function () {
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::post('/forget-password', [AuthController::class, 'recoveryPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-    Route::get('/profile/{id}', [ProfileController::class, 'show']);
+    Route::get('/profile/{id}', [ProfileController::class, 'show'])->name('profile.show');
 });

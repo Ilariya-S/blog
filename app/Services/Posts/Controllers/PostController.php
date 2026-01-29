@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Services\Posts\Managers\PostManager;
 use App\Services\Posts\Models\Post;
 use App\Services\Posts\Requests\CreatePostRequest;
+use App\Services\Posts\Requests\PostListRequest;
 use App\Services\Posts\Requests\UpdatePostRequest;
+use App\Services\Posts\Resources\ListOfPostsResource;
 use App\Services\Posts\Resources\PostResource;
 use Illuminate\Support\Facades\Gate;
 
@@ -60,5 +62,16 @@ class PostController extends Controller
         return response()->json([
             'data' => new PostResource($post),
         ]);
+    }
+
+    public function showListPosts(PostListRequest $request)
+    {
+        $payload = $request->validated();
+        $posts = $this->postManager->getPostList(
+            $payload['type'] ?? 'all',
+            $payload['tags'] ?? []
+        );
+
+        return ListOfPostsResource::collection($posts);
     }
 }
