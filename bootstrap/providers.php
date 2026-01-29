@@ -1,7 +1,8 @@
 <?php
 
 return [
-    //App\Providers\BaseServiceProvider::class,
+    // App\Providers\BaseServiceProvider::class,
     App\Services\Users\Providers\UserServiceProvider::class,
     App\Services\Posts\Providers\PostServiceProvider::class,
+    App\Services\Comments\Providers\CommentServiceProvider::class,
 ];
